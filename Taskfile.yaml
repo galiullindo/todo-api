@@ -1,0 +1,46 @@
+version: '3'
+
+vars:
+  GO_VERSION: '1.25'
+  MIGRATE_VERSION: 'v4.20.1'
+  MIGRATE_TAG: 'sqlite3'
+
+  BIN_DIR: '{{.ROOT_DIR}}/bin'
+  DATA_DIR: '{{.ROOT_DIR}}/data'
+  MIGRATIONS_DIR: '{{.ROOT_DIR}}/db/migrations'
+
+  MIGRATE: '{{.BIN_DIR}}/migrate'
+
+  DSN: 'sqlite3://{{.DATA_DIR}}/todo.db'
+
+tasks:
+  install-migrate:
+    desc: "Устанавливаем утилиту migrate в ./bin"
+    cmds: 
+      - |
+        [ -f {{.MIGRATE}} ] || {
+          echo 'Устанавливаем migrate {{.MIGRATE_VERSION}} {{.MIGRATE_TAG}}...'
+          GOBIN={{.BIN_DIR}} go install -tags '{{.MIGRATE_TAG}}' github.com/golang-migrate/migrate/v4/cmd/migrate@{{.MIGRATE_VERSION}}
+        }
+    status:
+      - test -x {{.MIGRATE}}
+  
+  migrate-create:
+    desc: "Создает файл миграции .sql"
+    deps: [install-migrate]
+    cmds:
+      - '{{.MIGRATE}} create -ext sql -dir {{.MIGRATIONS_DIR}} {{.name}}'
+  
+  migrate-up: 
+    desc: "Выполняет миграцию вверх"
+    deps: [install-migrate]
+    cmds:
+      - '[ -d {{.DATA_DIR}} ] || mkdir -p {{.DATA_DIR}}'
+      - '{{.MIGRATE}} -path {{.MIGRATIONS_DIR}} -database {{.DSN}} up {{.n}}'
+    
+  migrate-down:
+    desc: "Выполняет миграцию вниз"
+    deps: [install-migrate]
+    cmds:
+      - '[ -d {{.DATA_DIR}} ] || mkdir -p {{.DATA_DIR}}'
+      - '{{.MIGRATE}} -path {{.MIGRATIONS_DIR}} -database {{.DSN}} down {{.n}}'
