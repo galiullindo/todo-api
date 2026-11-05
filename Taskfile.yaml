@@ -6,6 +6,7 @@ vars:
   MIGRATE_TAG: 'sqlite3'
 
   BIN_DIR: '{{.ROOT_DIR}}/bin'
+  CMD_DIR: '{{.ROOT_DIR}}/cmd'
   DATA_DIR: '{{.ROOT_DIR}}/data'
   MIGRATIONS_DIR: '{{.ROOT_DIR}}/db/migrations'
 
@@ -44,3 +45,8 @@ tasks:
     cmds:
       - '[ -d {{.DATA_DIR}} ] || mkdir -p {{.DATA_DIR}}'
       - '{{.MIGRATE}} -path {{.MIGRATIONS_DIR}} -database {{.DSN}} down {{.n}}'
+  
+  build:
+    desc: "Выполнить сборку сервиса в ./bin"
+    cmds:
+      - go build -o {{.BIN_DIR}}/todo {{.CMD_DIR}}/todo
