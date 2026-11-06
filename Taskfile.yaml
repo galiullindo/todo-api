@@ -1,7 +1,10 @@
 version: '3'
 
 vars:
-  GO_VERSION: '1.25'
+  VERSION: 
+     sh: 'git describe --tags 2>/dev/null || echo "dev"'
+  NAME: todo-api
+
   MIGRATE_VERSION: 'v4.20.1'
   MIGRATE_TAG: 'sqlite3'
 
@@ -12,11 +15,11 @@ vars:
 
   MIGRATE: '{{.BIN_DIR}}/migrate'
 
-  DSN: 'sqlite3://{{.DATA_DIR}}/todo.db'
+  DSN: 'sqlite3://{{.DATA_DIR}}/production.db'
 
 tasks:
   install-migrate:
-    desc: "Устанавливаем утилиту migrate в ./bin"
+    desc: "Устанавливает утилиту migrate в ./bin"
     cmds: 
       - |
         [ -f {{.MIGRATE}} ] || {
@@ -47,7 +50,22 @@ tasks:
       - '{{.MIGRATE}} -path {{.MIGRATIONS_DIR}} -database {{.DSN}} down {{.n}}'
   
   build:
-    desc: "Выполнить сборку сервиса в ./bin"
+    desc: "Выполняет сборку сервиса в ./bin"
     cmds:
       - go build -o {{.BIN_DIR}}/api {{.CMD_DIR}}/api
   
+  docker-build:
+    desc: "Выполняет сборку docker образа"
+    preconditions:
+      - sh: command -v docker
+        msg: "Docker не установлен..."
+    cmds: 
+      - 'docker build --build-arg VERSION={{.VERSION}} -t {{.NAME}} -t {{.NAME}}:{{.VERSION}} .'
+
+  docker-run:
+    desc: "Выполняет создание нового docker контейнера и его запуск"
+    preconditions:
+      - sh: command -v docker
+        msg: "Docker не установлен..."
+    cmds:
+    - 'docker run -d -p 8080:8080 -v {{.DATA_DIR}}:/usr/local/share --name {{.NAME}}-{{.VERSION}} {{.NAME}}:{{.VERSION}}'
