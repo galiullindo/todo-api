@@ -11,11 +11,12 @@ vars:
   BIN_DIR: '{{.ROOT_DIR}}/bin'
   CMD_DIR: '{{.ROOT_DIR}}/cmd'
   DATA_DIR: '{{.ROOT_DIR}}/data'
+  BUILD_DIR: '{{.ROOT_DIR}}/build'
   MIGRATIONS_DIR: '{{.ROOT_DIR}}/db/migrations'
 
   MIGRATE: '{{.BIN_DIR}}/migrate'
 
-  DSN: 'sqlite3://{{.DATA_DIR}}/production.db'
+  DB_URI: 'sqlite3://{{.DATA_DIR}}/production.db'
 
 tasks:
   install-migrate:
@@ -40,19 +41,19 @@ tasks:
     deps: [install-migrate]
     cmds:
       - '[ -d {{.DATA_DIR}} ] || mkdir -p {{.DATA_DIR}}'
-      - '{{.MIGRATE}} -path {{.MIGRATIONS_DIR}} -database {{.DSN}} up {{.n}}'
+      - '{{.MIGRATE}} -path {{.MIGRATIONS_DIR}} -database {{.DB_URI}} up {{.n}}'
     
   migrate-down:
     desc: "Выполняет миграцию вниз"
     deps: [install-migrate]
     cmds:
       - '[ -d {{.DATA_DIR}} ] || mkdir -p {{.DATA_DIR}}'
-      - '{{.MIGRATE}} -path {{.MIGRATIONS_DIR}} -database {{.DSN}} down {{.n}}'
+      - '{{.MIGRATE}} -path {{.MIGRATIONS_DIR}} -database {{.DB_URI}} down {{.n}}'
   
   build:
     desc: "Выполняет сборку сервиса в ./bin"
     cmds:
-      - go build -o {{.BIN_DIR}}/api {{.CMD_DIR}}/api
+      - go build -o {{.BUILD_DIR}}/api -ldflags="-s -w -X main.Version={{.VERSION}}" {{.CMD_DIR}}/api
   
   docker-build:
     desc: "Выполняет сборку docker образа"

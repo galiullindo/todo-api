@@ -2,3 +2,4 @@ bin
 data
 *.db
 .env
+build
