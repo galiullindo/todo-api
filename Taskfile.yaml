@@ -50,10 +50,19 @@ tasks:
       - '[ -d {{.DATA_DIR}} ] || mkdir -p {{.DATA_DIR}}'
       - '{{.MIGRATE}} -path {{.MIGRATIONS_DIR}} -database {{.DB_URI}} down {{.n}}'
   
-  build:
-    desc: "Выполняет сборку сервиса в ./bin"
+  copy-db:
+    desc: "Создает ссылку на файл базы данных в ./build"
+    preconditions:
+      - sh: 'test -f {{.DATA_DIR}}/production.db'
+        msg: "Файл базы данных еще не создан..."
     cmds:
-      - go build -o {{.BUILD_DIR}}/api -ldflags="-s -w -X main.Version={{.VERSION}}" {{.CMD_DIR}}/api
+      - 'mkdir -p {{.BUILD_DIR}}'
+      - 'ln -sf {{.DATA_DIR}}/production.db {{.BUILD_DIR}}/production.db'
+
+  build:
+    desc: "Выполняет сборку сервиса в ./build"
+    cmds:
+      - 'go build -o {{.BUILD_DIR}}/api -ldflags="-s -w -X main.Version={{.VERSION}}" {{.CMD_DIR}}/api'
   
   docker-build:
     desc: "Выполняет сборку docker образа"
