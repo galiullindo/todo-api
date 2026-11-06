@@ -7,8 +7,8 @@ type Config struct {
 }
 
 var config = &Config{
-	DatabaseURI: "/usr/local/share/production.db", // TODO: временно для docker
-	Host:        "0.0.0.0",                        // TODO: временно для docker
+	DatabaseURI: "production.db",
+	Host:        "localhost",
 	Port:        "8080",
 }
 
