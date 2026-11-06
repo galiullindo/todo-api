@@ -13,8 +13,8 @@ import (
 	"syscall"
 	"time"
 
-	taskHandler "github.com/galiullindo/todo-api/internal/api"
 	"github.com/galiullindo/todo-api/internal/config"
+	taskHandler "github.com/galiullindo/todo-api/internal/handler"
 	taskRepository "github.com/galiullindo/todo-api/internal/repository"
 	taskService "github.com/galiullindo/todo-api/internal/service"
 	_ "github.com/mattn/go-sqlite3"
