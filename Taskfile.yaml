@@ -49,4 +49,5 @@ tasks:
   build:
     desc: "Выполнить сборку сервиса в ./bin"
     cmds:
-      - go build -o {{.BIN_DIR}}/todo {{.CMD_DIR}}/todo
+      - go build -o {{.BIN_DIR}}/api {{.CMD_DIR}}/api
+  
