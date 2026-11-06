@@ -7,8 +7,8 @@ type Config struct {
 }
 
 var config = &Config{
-	DSN:  "../data/todo.db",
-	Host: "localhost",
+	DSN:  "/usr/local/share/production.db", // TODO: временно для docker
+	Host: "0.0.0.0",                        // TODO: временно для docker
 	Port: "8080",
 }
 
