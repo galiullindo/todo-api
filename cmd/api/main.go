@@ -4,12 +4,12 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"flag"
 	"log"
 	"net"
 	"net/http"
 	"os"
 	"os/signal"
-	"path/filepath"
 	"syscall"
 	"time"
 
@@ -21,13 +21,19 @@ import (
 )
 
 func main() {
-	var (
-		root = filepath.Dir(os.Args[0])
-		cfg  = config.New()
-	)
+	var configDir string
+	fs := flag.NewFlagSet("server", flag.ExitOnError)
+	fs.StringVar(&configDir, "config-dir", "configs", "path to configs directory")
+	fs.Parse(os.Args[1:])
+
+	log.Println("load config")
+	cfg, err := config.Load(configDir)
+	if err != nil {
+		log.Printf("load config: %v\n", err)
+	}
 
 	log.Println("open db")
-	db, err := sql.Open("sqlite3", filepath.Join(root, cfg.DatabaseURI))
+	db, err := sql.Open("sqlite3", cfg.Database.URI)
 	if err != nil {
 		log.Fatalf("open db: %v\n", err)
 	}
@@ -47,7 +53,7 @@ func main() {
 	taskHndl.RegisterRoutes(mux)
 
 	server := &http.Server{
-		Addr:         net.JoinHostPort(cfg.Host, cfg.Port),
+		Addr:         net.JoinHostPort(cfg.Server.Host, cfg.Server.Port),
 		Handler:      mux,
 		ReadTimeout:  15 * time.Second,
 		WriteTimeout: 15 * time.Second,
