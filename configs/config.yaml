@@ -1,0 +1,6 @@
+server:
+  host: "localhost"
+  por: "8080"
+
+database:
+  uri: "data/prod.db"
