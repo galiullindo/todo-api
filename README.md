@@ -26,39 +26,48 @@ REST API для управления задачами в TODO-листе
 
 Для запуска понадобится [Taskfile](https://taskfile.dev)
 
+Для работы с миграциями [migrate] (https://github.com/golang-migrate/migrate)
+
 ### Команды для разработки
 
-Подробнее с командами можно ознакомиться в Taskfile.yaml
-
 ```bash
-# Миграции
+# Установка migrate
+task install-migrate
+
+# Работа с миграциями
 task migrate-create 
 task migrate-up    
 task migrate-down
 
-# Сборка
-task copy-db  
+# Сборка проекта
 task build
+task clean
+task deploy
 
-# Docker
+# Работа с docker
 task docker-build
 task docker-run
+```
+
+Для команд можно передавать окружения через переменную `ENV`.
+
+```bash
+# ENV = {prod, test, docker}
+
+# Работа с миграциями
+ENV=test task migrate-up    
+ENV=test task migrate-down
+
+# Сборка проекта
+ENV=test task build
 ```
 
 ### Запуск проекта
 
 ```bash
-# Обновляем базу данных до последней версии
-task migrate-up
-
-# Создаем ссылку на базу данных в папке с исполняемым файлом
-task copy-db
-
-# Собираем сервис в исполняемый файл
-task build
-    
-# Запускаем сервис
-build/api
+task deploy
+cd build
+./server
 ```
 
 ## API
