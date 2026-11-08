@@ -26,7 +26,7 @@ REST API для управления задачами в TODO-листе
 
 Для запуска понадобится [Taskfile](https://taskfile.dev)
 
-Для работы с миграциями [migrate] (https://github.com/golang-migrate/migrate)
+Для работы с миграциями [migrate](https://github.com/golang-migrate/migrate)
 
 ### Команды для разработки
 
