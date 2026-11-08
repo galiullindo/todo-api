@@ -17,9 +17,9 @@ vars:
   MIGRATIONS_DIR: '{{.ROOT_DIR}}/db/migrations'
   
   DATA_DIR: '{{.ROOT_DIR}}/data'
-  DB_FILE: '{{ index (dict "test" "test.db") (default "prod" .ENV) | default "prod.db" }}'
-  DB: '{{.DATA_DIR}}/{{.DB_FILE}}'
-  DB_URI: 'sqlite3://{{.DB}}'
+  DB_FILE: '{{ index (dict "test" "test.db" "docker" "docker.db") (default "prod" .ENV) | default "prod.db" }}'
+  DB_PATH: '{{.DATA_DIR}}/{{.DB_FILE}}'
+  DB_URI: 'sqlite3://{{.DB_PATH}}'
 
 tasks:
   install-migrate:
