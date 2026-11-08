@@ -3,9 +3,3 @@ CREATE TABLE IF NOT EXISTS tasks (
     , title TEXT
     , status TEXT
 );
-
-INSERT INTO tasks (title, status) 
-VALUES ('Умыться и по чистить зубы.','в процессе')
-    , ('Приготовить завтрак.', 'в планах')
-    , ('Позавтракать и выпить стаканчик валерьянки.','на рассмотрении')
-;
