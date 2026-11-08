@@ -9,14 +9,17 @@ vars:
   MIGRATE_TAG: 'sqlite3'
 
   BIN_DIR: '{{.ROOT_DIR}}/bin'
-  CMD_DIR: '{{.ROOT_DIR}}/cmd'
-  DATA_DIR: '{{.ROOT_DIR}}/data'
-  BUILD_DIR: '{{.ROOT_DIR}}/build'
-  MIGRATIONS_DIR: '{{.ROOT_DIR}}/db/migrations'
-
   MIGRATE: '{{.BIN_DIR}}/migrate'
 
-  DB_URI: 'sqlite3://{{.DATA_DIR}}/production.db'
+  BUILD_DIR: '{{.ROOT_DIR}}/build'
+  CMD_DIR: '{{.ROOT_DIR}}/cmd'
+  CONFIGS_DIR: '{{.ROOT_DIR}}/configs'
+  MIGRATIONS_DIR: '{{.ROOT_DIR}}/db/migrations'
+  
+  DATA_DIR: '{{.ROOT_DIR}}/data'
+  DB_FILE: '{{ index (dict "test" "test.db") (default "prod" .ENV) | default "prod.db" }}'
+  DB: '{{.DATA_DIR}}/{{.DB_FILE}}'
+  DB_URI: 'sqlite3://{{.DB}}'
 
 tasks:
   install-migrate:
@@ -36,34 +39,46 @@ tasks:
     cmds:
       - '{{.MIGRATE}} create -ext sql -dir {{.MIGRATIONS_DIR}} {{.name}}'
   
+  data-dir:
+    internal: true
+    cmd: 'mkdir -p {{.DATA_DIR}}'
+
   migrate-up: 
     desc: "Выполняет миграцию вверх"
-    deps: [install-migrate]
-    cmds:
-      - '[ -d {{.DATA_DIR}} ] || mkdir -p {{.DATA_DIR}}'
+    deps: [install-migrate, data-dir]
+    cmds:      
       - '{{.MIGRATE}} -path {{.MIGRATIONS_DIR}} -database {{.DB_URI}} up {{.n}}'
     
   migrate-down:
     desc: "Выполняет миграцию вниз"
-    deps: [install-migrate]
+    deps: [install-migrate, data-dir]
     cmds:
-      - '[ -d {{.DATA_DIR}} ] || mkdir -p {{.DATA_DIR}}'
       - '{{.MIGRATE}} -path {{.MIGRATIONS_DIR}} -database {{.DB_URI}} down {{.n}}'
   
-  copy-db:
-    desc: "Создает ссылку на файл базы данных в ./build"
-    preconditions:
-      - sh: 'test -f {{.DATA_DIR}}/production.db'
-        msg: "Файл базы данных еще не создан..."
-    cmds:
-      - 'mkdir -p {{.BUILD_DIR}}'
-      - 'ln -sf {{.DATA_DIR}}/production.db {{.BUILD_DIR}}/production.db'
+  build-dir:
+    internal: true
+    cmd: 'mkdir -p {{.BUILD_DIR}}'
 
   build:
     desc: "Выполняет сборку сервиса в ./build"
+    deps: [build-dir] 
     cmds:
-      - 'go build -o {{.BUILD_DIR}}/api -ldflags="-s -w -X main.Version={{.VERSION}}" {{.CMD_DIR}}/api'
+      - 'go build -o {{.BUILD_DIR}}/server -ldflags="-s -w -X main.Version={{.VERSION}}" {{.CMD_DIR}}/server'
   
+  clean: 
+    desc: "Удаляет все файлы из ./build"
+    deps: [build-dir]
+    cmd: rm -r {{.BUILD_DIR}}/*
+
+  deploy:
+    deps: [data-dir, build-dir, clean, build] 
+    desc: "Выполняет развертывание приложения в ./build"
+    cmds:
+      - 'task migrate-up'
+      - 'mkdir -p {{.BUILD_DIR}}/data'
+      - 'ln -sf {{.DATA_DIR}}/prod.db {{.BUILD_DIR}}/data/{{.DB_FILE}}'
+      - 'cp -r {{.CONFIGS_DIR}} {{.BUILD_DIR}}/configs'
+
   docker-build:
     desc: "Выполняет сборку docker образа"
     preconditions:
