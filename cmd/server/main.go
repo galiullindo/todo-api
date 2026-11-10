@@ -21,21 +21,35 @@ import (
 )
 
 func main() {
-	var configDir string
+	var cliArguments struct {
+		configsDir string
+		env        string
+	}
+
 	fs := flag.NewFlagSet("server", flag.ExitOnError)
-	fs.StringVar(&configDir, "config-dir", "configs", "path to configs directory")
+	fs.StringVar(&cliArguments.configsDir, "configs-dir", "", "path to configs directory")
+	fs.StringVar(&cliArguments.env, "env", "default", "enviroment (prod, test, docker)")
 	fs.Parse(os.Args[1:])
 
+	log.Println("parse cli argument 'env'")
+	env, err := config.ParseEnv(cliArguments.env)
+	if err != nil {
+		log.Printf("parse cli argument 'env': %v\n", err)
+		return
+	}
+
 	log.Println("load config")
-	cfg, err := config.Load(configDir)
+	cfg, err := config.Load(cliArguments.configsDir, env)
 	if err != nil {
 		log.Printf("load config: %v\n", err)
+		return
 	}
 
 	log.Println("open db")
 	db, err := sql.Open("sqlite3", cfg.Database.URI)
 	if err != nil {
-		log.Fatalf("open db: %v\n", err)
+		log.Printf("open db: %v\n", err)
+		return
 	}
 	defer db.Close()
 
