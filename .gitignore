@@ -3,3 +3,6 @@ data
 *.db
 .env
 build
+configs/config.prod.yaml
+configs/config.test.yaml
+configs/config.docker.yaml

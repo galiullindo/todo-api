@@ -1,6 +1,0 @@
-server:
-  host: "localhost"
-  por: "8081"
-
-database:
-  uri: "data/test.db"
