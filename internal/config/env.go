@@ -1,6 +1,9 @@
 package config
 
-import "errors"
+import (
+	"errors"
+	"fmt"
+)
 
 var ErrUnknownEnviroment = errors.New("unknown enviroment")
 
@@ -24,6 +27,6 @@ func ParseEnv(s string) (Env, error) {
 	case "docker":
 		return EnvDocker, nil
 	default:
-		return "", ErrUnknownEnviroment
+		return "", fmt.Errorf("%q %w", s, ErrUnknownEnviroment)
 	}
 }
