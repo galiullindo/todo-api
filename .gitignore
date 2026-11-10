@@ -6,3 +6,4 @@ build
 configs/config.prod.yaml
 configs/config.test.yaml
 configs/config.docker.yaml
+configs/config.yaml
