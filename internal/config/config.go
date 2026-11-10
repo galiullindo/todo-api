@@ -1,7 +1,6 @@
 package config
 
 import (
-	"os"
 	"path/filepath"
 
 	"github.com/ilyakaznacheev/cleanenv"
@@ -21,13 +20,15 @@ type DatabaseConfig struct {
 	URI string `yaml:"uri"`
 }
 
-func Load(path string) (*Config, error) {
+func Load(path string, env Env) (*Config, error) {
 	var configFile string
-	switch env := os.Getenv("ENV"); env {
-	case "test":
-		configFile = "test.yaml"
-	case "docker":
-		configFile = "docker.yaml"
+	switch env {
+	case EnvProd:
+		configFile = "config.prod.yaml"
+	case EnvTest:
+		configFile = "config.test.yaml"
+	case EnvDocker:
+		configFile = "config.docker.yaml"
 	default:
 		configFile = "config.yaml"
 	}
