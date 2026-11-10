@@ -27,7 +27,7 @@ func main() {
 	}
 
 	fs := flag.NewFlagSet("server", flag.ExitOnError)
-	fs.StringVar(&cliArguments.configsDir, "configs-dir", "", "path to configs directory")
+	fs.StringVar(&cliArguments.configsDir, "configs-dir", ".", "path to configs directory")
 	fs.StringVar(&cliArguments.env, "env", "default", "enviroment (prod, test, docker)")
 	fs.Parse(os.Args[1:])
 
