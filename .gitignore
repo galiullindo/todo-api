@@ -1,9 +1,9 @@
 bin
-data
-*.db
-.env
 build
-configs/config.prod.yaml
-configs/config.test.yaml
-configs/config.docker.yaml
-configs/config.yaml
+data
+
+configs/*
+!configs/config.prod.example.yaml
+!configs/config.test.example.yaml
+!configs/config.docker.example.yaml
+!configs/config.example.yaml

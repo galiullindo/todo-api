@@ -1,6 +1,8 @@
-bin/
-data/
-db/
+bin
+build
+data
+db
+
 .git
 .gitignore
 Taskfile.yaml
