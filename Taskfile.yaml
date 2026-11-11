@@ -17,6 +17,8 @@ vars:
   MIGRATIONS_DIR: '{{.ROOT_DIR}}/db/migrations'
   
   DATA_DIR: '{{.ROOT_DIR}}/data'
+  DATA_DOCKER_DIR: '{{.DATA_DIR}}/docker'
+
   DB_FILE: '{{ index (dict "test" "test.db" "docker" "docker.db") (default "todolist.db" .ENV) | default "todolist.db" }}'
   DB_PATH: '{{.DATA_DIR}}/{{.DB_FILE}}'
   DB_URI: 'sqlite3://{{.DB_PATH}}'
@@ -73,42 +75,49 @@ tasks:
     desc: "Выполняет запуск e2e-тестов"
     cmd: 'go test -v -cover -run TestAPI ./internal/tests/... -- --configs-dir={{.CONFIGS_DIR}}'
 
-
-
-
-  # переделать
-  clean: 
-    desc: "Удаляет все файлы из ./build"
-    deps: [build-dir]
-    cmd: rm -r {{.BUILD_DIR}}/*
-
-  # переделать
-  deploy:
-    deps: [data-dir, build-dir] 
-    desc: "Выполняет развертывание приложения в ./build"
-    cmds:
-      - 'task clean'
-      - 'task build'
-      - 'task migrate-up'
-      - 'mkdir -p {{.BUILD_DIR}}/data'
-      - 'ln -sf {{.DATA_DIR}}/prod.db {{.BUILD_DIR}}/data/{{.DB_FILE}}'
-      - 'cp -r {{.CONFIGS_DIR}} {{.BUILD_DIR}}/configs'
-
-  # переделать
   docker-build:
-    desc: "Выполняет сборку docker образа"
+    desc: "Выполняет сборку Docker-образа todolist-rest-api"
     preconditions:
       - sh: command -v docker
         msg: "Docker не установлен..."
-    cmds: 
-      - 'docker build --build-arg VERSION={{.APP_VERSION}} -t {{.APP_NAME}} -t {{.APP_NAME}}:{{.APP_VERSION}} .'
+    cmd: |
+      docker build \
+        --build-arg VERSION={{.APP_VERSION}} \
+        -t {{.APP_NAME}} \
+        -t {{.APP_NAME}}:{{.APP_VERSION}} \
+        .
+
+  data-docker-dir:
+    internal: true
+    cmd: 'mkdir -p {{.DATA_DOCKER_DIR}}'
+
+  docker-run:
+    desc: "Выполняет создание и запуск Docker-контейнера todolist-rest-api"
+    deps: [data-docker-dir]
+    preconditions:
+      - sh: command -v docker
+        msg: "Docker не установлен..."
+    cmd: |
+      docker run -d \
+        --name {{.APP_NAME}}-{{.APP_VERSION}} \
+        -p 8083:8083 \
+        -v {{.DATA_DOCKER_DIR}}:/todolist-rest-api/data \
+        {{.APP_NAME}}:{{.APP_VERSION}}
 
   # переделать
-  docker-run:
-    desc: "Выполняет создание нового docker контейнера и его запуск"
-    preconditions:
-      - sh: command -v docker
-        msg: "Docker не установлен..."
-    cmds:
-    - 'docker run -d -p 8080:8080 -v {{.DATA_DIR}}:/usr/local/share --name {{.APP_NAME}}-{{.APP_VERSION}} {{.APP_NAME}}:{{.APP_VERSION}}'
+  # clean: 
+  #   desc: "Удаляет все файлы из ./build"
+  #   deps: [build-dir]
+  #   cmd: rm -r {{.BUILD_DIR}}/*
 
+  # переделать
+  # deploy:
+  #   deps: [data-dir, build-dir] 
+  #   desc: "Выполняет развертывание приложения в ./build"
+  #   cmds:
+  #     - 'task clean'
+  #     - 'task build'
+  #     - 'task migrate-up'
+  #     - 'mkdir -p {{.BUILD_DIR}}/data'
+  #     - 'ln -sf {{.DATA_DIR}}/prod.db {{.BUILD_DIR}}/data/{{.DB_FILE}}'
+  #     - 'cp -r {{.CONFIGS_DIR}} {{.BUILD_DIR}}/configs'
