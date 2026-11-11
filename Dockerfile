@@ -2,16 +2,16 @@
 FROM golang:1.25.6-alpine3.23 AS builder
 ARG VERSION
 
-RUN apk add --no-cache gcc musl-dev
+RUN apk upgrade --no-cache \
+    && apk add --no-cache gcc musl-dev
 
-WORKDIR /todo-api
+WORKDIR /todolist-rest-api
 
 COPY go.mod go.sum ./
 RUN go mod download
 
 COPY . ./
-
-RUN CGO_ENABLED=1 go build -a -o build/server -ldflags="-s -w -X main.Version=${VERSION}" ./cmd/api
+RUN CGO_ENABLED=1 go build -a -o build/todolist -ldflags="-s -w -X main.Version=${VERSION}" ./cmd/todolist
 
 # image
 FROM alpine:3.23
@@ -19,11 +19,11 @@ FROM alpine:3.23
 RUN apk upgrade --no-cache \
     && apk add --no-cache sqlite-libs ca-certificates
     
-WORKDIR /todo-api
+WORKDIR /todolist-rest-api
+COPY --from=builder /todolist-rest-api/build/todolist  ./todolist
+COPY --from=builder /todolist-rest-api/configs/config.docker.yaml ./config.yaml
 RUN mkdir ./data
 
-COPY --from=builder /todo-api/build/server  ./server
+EXPOSE 8083
 
-EXPOSE 8080
-
-ENTRYPOINT [ "server" ]
+ENTRYPOINT ["./todolist"]
