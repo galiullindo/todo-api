@@ -41,25 +41,22 @@ task migrate-down
 
 # Сборка проекта
 task build
-task clean
-task deploy
-
-# Работа с docker
-task docker-build
-task docker-run
+task run
+task e2e-test
 ```
 
-Для команд можно передавать окружения через переменную `ENV`.
+#### task run
+
+В команду можно передать параметр `env` - окружение. Допустимые значения `default`, `prod`, `test`, `docker`.
+
+В зависимости от окружения настройки берутся из соответствующего конфигурационного файла: `config.yaml`, `config.prod.yaml`, `config.test.yaml`, `config.docker.yaml`. По умолчанию установлено значение `default`.
 
 ```bash
-# ENV = {prod, test, docker}
+# По умолчанию env=default
+task run
 
-# Работа с миграциями
-ENV=test task migrate-up    
-ENV=test task migrate-down
-
-# Сборка проекта
-ENV=test task build
+# Тоже самое что task run
+task run env=default 
 ```
 
 ### Запуск проекта
