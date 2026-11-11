@@ -17,7 +17,7 @@ vars:
   MIGRATIONS_DIR: '{{.ROOT_DIR}}/db/migrations'
   
   DATA_DIR: '{{.ROOT_DIR}}/data'
-  DB_FILE: '{{ index (dict "test" "test.db" "docker" "docker.db") (default "prod" .ENV) | default "prod.db" }}'
+  DB_FILE: '{{ index (dict "test" "test.db" "docker" "docker.db") (default "todolist.db" .ENV) | default "todolist.db" }}'
   DB_PATH: '{{.DATA_DIR}}/{{.DB_FILE}}'
   DB_URI: 'sqlite3://{{.DB_PATH}}'
 
@@ -37,7 +37,7 @@ tasks:
     desc: "Создает файл миграции .sql"
     deps: [install-migrate]
     cmds:
-      - '{{.MIGRATE}} create -ext sql -dir {{.MIGRATIONS_DIR}} {{.name}}'
+      - '{{.MIGRATE}} create -ext sql -dir {{.MIGRATIONS_DIR}} {{.CLI_ARGS}}'
   
   data-dir:
     internal: true
