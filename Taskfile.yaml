@@ -62,30 +62,41 @@ tasks:
   build:
     desc: "Выполняет сборку todolist rest api в ./build"
     deps: [build-dir] 
-    cmds:
-      - 'go build -o {{.BUILD_DIR}}/{{.APP_NAME}} -ldflags="-s -w -X main.Version={{.APP_VERSION}}" {{.CMD_DIR}}/{{.APP_NAME}}'
+    cmd: 'go build -o {{.BUILD_DIR}}/{{.APP_NAME}} -ldflags="-s -w -X main.Version={{.APP_VERSION}}" {{.CMD_DIR}}/{{.APP_NAME}}'
   
   run:
     desc: "Выполняет запуск todolist rest api из ./build"
     deps: [build]
     vars:
       env: default
-    cmd: '{{.BUILD_DIR}}/{{.APP_NAME}} --env {{.env}} --configs-dir {{.CONFIGS_DIR}}'
+    cmd: '{{.BUILD_DIR}}/{{.APP_NAME}} --env={{.env}} --configs-dir={{.CONFIGS_DIR}}'
 
+  e2e-test:
+    desc: "Выполняет запуск e2e-тестов"
+    cmd: 'go test -v -cover -run TestAPI ./internal/tests/... -- --configs-dir={{.CONFIGS_DIR}}'
+
+
+
+
+  # переделать
   clean: 
     desc: "Удаляет все файлы из ./build"
     deps: [build-dir]
     cmd: rm -r {{.BUILD_DIR}}/*
 
+  # переделать
   deploy:
-    deps: [data-dir, build-dir, clean, build] 
+    deps: [data-dir, build-dir] 
     desc: "Выполняет развертывание приложения в ./build"
     cmds:
+      - 'task clean'
+      - 'task build'
       - 'task migrate-up'
       - 'mkdir -p {{.BUILD_DIR}}/data'
       - 'ln -sf {{.DATA_DIR}}/prod.db {{.BUILD_DIR}}/data/{{.DB_FILE}}'
       - 'cp -r {{.CONFIGS_DIR}} {{.BUILD_DIR}}/configs'
 
+  # переделать
   docker-build:
     desc: "Выполняет сборку docker образа"
     preconditions:
@@ -94,6 +105,7 @@ tasks:
     cmds: 
       - 'docker build --build-arg VERSION={{.APP_VERSION}} -t {{.APP_NAME}} -t {{.APP_NAME}}:{{.APP_VERSION}} .'
 
+  # переделать
   docker-run:
     desc: "Выполняет создание нового docker контейнера и его запуск"
     preconditions:
