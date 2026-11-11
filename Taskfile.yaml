@@ -46,14 +46,12 @@ tasks:
   migrate-up: 
     desc: "Выполняет миграцию вверх"
     deps: [install-migrate, data-dir]
-    cmds:      
-      - '{{.MIGRATE}} -path {{.MIGRATIONS_DIR}} -database {{.DB_URI}} up {{.n}}'
+    cmd: '{{.MIGRATE}} -path {{.MIGRATIONS_DIR}} -database {{.DB_URI}} up {{.CLI_ARGS}}'
     
   migrate-down:
     desc: "Выполняет миграцию вниз"
     deps: [install-migrate, data-dir]
-    cmds:
-      - '{{.MIGRATE}} -path {{.MIGRATIONS_DIR}} -database {{.DB_URI}} down {{.n}}'
+    cmd: '{{.MIGRATE}} -path {{.MIGRATIONS_DIR}} -database {{.DB_URI}} down {{.CLI_ARGS}}'
   
   build-dir:
     internal: true
