@@ -44,8 +44,51 @@ task build
 task run
 task e2e-test
 ```
+#### task migrate-create
+
+Команда выполняет создание `.up.sql` и `.down.sql` файлов миграции в `./db/migrations`.
+
+В команду передается имя файла миграции.
+
+```bash
+# Создает:
+#  ./db/migrations/YYYYMMDDHHmmss_example_migration.up.sql
+#  ./db/migrations/YYYYMMDDHHmmss_example_migration.up.sql
+task migrate-create -- example_migration
+```
+
+#### task migrate-up
+
+Команда выполняет `.up.sql` миграции.
+
+В команду можно передать количество миграций, которое необходимо выполнить. По умолчанию выполняются все миграции.
+
+```bash
+# Выполнит все миграции
+task migrate-up
+
+# Выполнит 1 миграцию
+task migrate-up -- 1
+```
+
+
+#### task migrate-down
+
+Команда выполняет `.down.sql` миграции (откатывает изменения соответствующих `.up.sql` миграций).
+
+В команду можно передать количество миграций, которое необходимо выполнить. По умолчанию выполняются все миграции, но требуется подтверждение.
+
+```bash
+# Выполнит все миграции
+task migrate-down
+
+# Выполнит 1 миграцию
+task migrate-down -- 1
+```
 
 #### task run
+
+Команда выполняет запуск исполняемого файла todolist в `.build`.
 
 В команду можно передать параметр `env` - окружение. Допустимые значения `default`, `prod`, `test`, `docker`.
 
