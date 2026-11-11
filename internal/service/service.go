@@ -1,7 +1,7 @@
 package service
 
 import (
-	"github.com/galiullindo/todo-api/internal/model"
+	"github.com/galiullindo/todolist-rest-api/internal/model"
 )
 
 type Repository interface {

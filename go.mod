@@ -1,4 +1,4 @@
-module github.com/galiullindo/todo-api
+module github.com/galiullindo/todolist-rest-api
 
 go 1.25.6
 

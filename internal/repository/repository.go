@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"log"
 
-	"github.com/galiullindo/todo-api/internal/model"
+	"github.com/galiullindo/todolist-rest-api/internal/model"
 )
 
 type repository struct {

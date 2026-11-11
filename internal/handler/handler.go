@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/galiullindo/todo-api/internal/model"
+	"github.com/galiullindo/todolist-rest-api/internal/model"
 )
 
 type Service interface {

@@ -12,11 +12,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/galiullindo/todo-api/internal/config"
-	taskHandler "github.com/galiullindo/todo-api/internal/handler"
-	"github.com/galiullindo/todo-api/internal/model"
-	taskRepository "github.com/galiullindo/todo-api/internal/repository"
-	taskService "github.com/galiullindo/todo-api/internal/service"
+	"github.com/galiullindo/todolist-rest-api/internal/config"
+	taskHandler "github.com/galiullindo/todolist-rest-api/internal/handler"
+	"github.com/galiullindo/todolist-rest-api/internal/model"
+	taskRepository "github.com/galiullindo/todolist-rest-api/internal/repository"
+	taskService "github.com/galiullindo/todolist-rest-api/internal/service"
 	_ "github.com/mattn/go-sqlite3"
 )
 
